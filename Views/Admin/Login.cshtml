@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Admin Giriş";
+}
+
+<div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card p-4" style="min-width:300px; max-width:400px; width:100%;">
+        <h2 class="mb-3 text-center">Admin Girişi</h2>
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+        <form method="post" class="w-100">
+            <div class="mb-3">
+                <input type="password" name="password" class="form-control form-control-lg" placeholder="Şifre" required />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Giriş Yap</button>
+        </form>
+    </div>
+</div> 

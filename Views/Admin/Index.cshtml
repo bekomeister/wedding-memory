@@ -1,0 +1,169 @@
+@model List<wedding_memory.Models.Wedding>
+@{
+    ViewData["Title"] = "Admin Paneli";
+}
+
+<style>
+.theme-preview {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #dee2e6;
+}
+
+.theme-preview.classic {
+    background: linear-gradient(45deg, #0d6efd 0%, #2d6cdf 100%);
+}
+
+.theme-preview.romantic {
+    background: linear-gradient(45deg, #e91e63 0%, #f06292 100%);
+}
+
+.theme-preview.elegant {
+    background: linear-gradient(45deg, #9c27b0 0%, #ba68c8 100%);
+}
+
+.theme-preview.modern {
+    background: linear-gradient(45deg, #2196f3 0%, #64b5f6 100%);
+}
+</style>
+
+<div class="container py-5">
+    <h2 class="mb-4">Çift Ekle</h2>
+    <form method="post" asp-action="AddWedding">
+        <div class="row mb-3">
+            <div class="col-md-5">
+                <input type="text" name="brideName" class="form-control" placeholder="Gelin Adı" required />
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="groomName" class="form-control" placeholder="Damat Adı" required />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success w-100">Ekle</button>
+            </div>
+        </div>
+    </form>
+
+    <h3 class="mt-5 mb-3">Mevcut Çiftler</h3>
+    <div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th class="text-center">ID</th>
+                <th class="text-end">Gelin</th>
+                <th>Damat</th>
+                <th class="text-center">Tema</th>
+                <th class="text-center">Yükleme Linki</th>
+                <th class="text-center">QR Kod</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                int i = 1;
+                foreach (var wedding in Model)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td class="text-center text-break">@wedding.Id</td>
+                        <td class="text-end text-break">@wedding.BrideName</td>
+                        <td class="text-break">@wedding.GroomName</td>
+                        <td class="text-center">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-info btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    @GetThemeDisplayName(wedding.Theme ?? "classic")
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="updateTheme('@wedding.Id', 'classic')">
+                                        <span class="theme-preview classic me-2"></span>🎨 Klasik
+                                    </a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="updateTheme('@wedding.Id', 'romantic')">
+                                        <span class="theme-preview romantic me-2"></span>💕 Romantik
+                                    </a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="updateTheme('@wedding.Id', 'elegant')">
+                                        <span class="theme-preview elegant me-2"></span>✨ Zarif
+                                    </a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="updateTheme('@wedding.Id', 'modern')">
+                                        <span class="theme-preview modern me-2"></span>🚀 Modern
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </td>
+                        <td class="text-center text-break">
+                            <a href="/Upload/@wedding.Id" target="_blank" class="btn btn-outline-primary btn-sm w-100">Yükleme Sayfası</a>
+                        </td>
+                        <td class="text-center">
+                            <a href="/Admin/Qr/@wedding.Id" class="btn btn-outline-secondary btn-sm w-100">QR Kod</a>
+                        </td>
+                    </tr>
+                    i++;
+                }
+            }
+            else
+            {
+                <tr><td colspan="7" class="text-center">Henüz çift eklenmedi.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@functions {
+    public string GetThemeDisplayName(string theme)
+    {
+        return theme switch
+        {
+            "classic" => "🎨 Klasik",
+            "romantic" => "💕 Romantik",
+            "elegant" => "✨ Zarif",
+            "modern" => "🚀 Modern",
+            _ => "🎨 Klasik"
+        };
+    }
+}
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        // Kopyalama başarılı olduğunda kullanıcıya bildir
+        const button = event.target.closest('button');
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<i class="bi bi-check"></i>';
+        button.classList.remove('btn-outline-secondary');
+        button.classList.add('btn-success');
+        
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-secondary');
+        }, 1000);
+    }).catch(function(err) {
+        console.error('Kopyalama başarısız: ', err);
+        alert('ID kopyalanamadı');
+    });
+}
+
+function updateTheme(weddingId, theme) {
+    // Form oluştur ve gönder
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/Admin/UpdateTheme';
+    
+    const idInput = document.createElement('input');
+    idInput.type = 'hidden';
+    idInput.name = 'id';
+    idInput.value = weddingId;
+    
+    const themeInput = document.createElement('input');
+    themeInput.type = 'hidden';
+    themeInput.name = 'theme';
+    themeInput.value = theme;
+    
+    form.appendChild(idInput);
+    form.appendChild(themeInput);
+    document.body.appendChild(form);
+    form.submit();
+}
+</script> 

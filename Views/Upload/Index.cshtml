@@ -1,0 +1,112 @@
+@{
+    ViewBag.Title = "Görsel Yükle";
+    var theme = ViewBag.Theme as string ?? "classic";
+}
+
+<style>
+/* Tema CSS'leri */
+.theme-classic .wedding-title { color: #2d6cdf; }
+.theme-classic .wedding-subtitle { color: #0d6efd; }
+.theme-classic .btn-primary { 
+    background-color: #0d6efd; 
+    border-color: #0d6efd; 
+}
+.theme-classic .card { border-color: #dee2e6; }
+
+.theme-romantic .wedding-title { color: #e91e63; }
+.theme-romantic .wedding-subtitle { color: #f06292; }
+.theme-romantic .btn-primary { 
+    background-color: #e91e63; 
+    border-color: #e91e63; 
+}
+.theme-romantic .card { 
+    border-color: #f8bbd9; 
+    background: linear-gradient(135deg, #fff5f8 0%, #ffeef7 100%); 
+}
+
+.theme-elegant .wedding-title { color: #9c27b0; }
+.theme-elegant .wedding-subtitle { color: #ba68c8; }
+.theme-elegant .btn-primary { 
+    background-color: #9c27b0; 
+    border-color: #9c27b0; 
+}
+.theme-elegant .card { 
+    border-color: #e1bee7; 
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e5f5 100%); 
+}
+
+.theme-modern .wedding-title { color: #2196f3; }
+.theme-modern .wedding-subtitle { color: #64b5f6; }
+.theme-modern .btn-primary { 
+    background-color: #2196f3; 
+    border-color: #2196f3; 
+}
+.theme-modern .card { 
+    border-color: #bbdefb; 
+    background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%); 
+}
+
+/* Hover efektleri */
+.theme-romantic .btn-primary:hover { 
+    background-color: #c2185b; 
+    border-color: #c2185b; 
+}
+.theme-elegant .btn-primary:hover { 
+    background-color: #7b1fa2; 
+    border-color: #7b1fa2; 
+}
+.theme-modern .btn-primary:hover { 
+    background-color: #1976d2; 
+    border-color: #1976d2; 
+}
+</style>
+
+<div class="container d-flex justify-content-center align-items-center pt-5 pb-5 theme-@theme">
+    <div class="row w-100 justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+            <div class="text-center mb-3">
+                <h1 class="wedding-title-responsive text-break wedding-title">@ViewBag.BrideName &amp; @ViewBag.GroomName</h1>
+                <h2 class="wedding-subtitle-responsive wedding-subtitle">Düğünümüze Hoşgeldiniz</h2>
+                <div class="mb-3" style="font-size:1.1rem; color:#222;">Birlikte nice güzel anılara!</div>
+            </div>
+            <div class="card shadow-lg border-0 w-100">
+                <div class="card-body p-4">
+                    <h5 class="text-center mb-4 wedding-subtitle" style="font-weight:600;">Yüklemeye Başla!</h5>
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+                    @if (ViewBag.Success != null)
+                    {
+                        <div class="alert alert-success" id="successMessage">@ViewBag.Success</div>
+                    }
+                    <form asp-action="Index" method="post" enctype="multipart/form-data" id="uploadForm">
+                        <div class="mb-3">
+                            <input type="text" name="userName" class="form-control form-control-lg" placeholder="Adınızı girin" required />
+                        </div>
+                        <div class="mb-3">
+                            <input type="file" name="files" class="form-control" multiple required />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fs-5">Yükle</button>
+                        <div id="loadingMessage" class="alert alert-info mt-3 text-center" style="display:none;">Lütfen bekleyiniz, dosyalar yükleniyor...</div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function() {
+        document.getElementById('loadingMessage').style.display = 'block';
+    });
+    // Başarı mesajını 3 saniye sonra gizle
+    window.addEventListener('DOMContentLoaded', function() {
+        var successMsg = document.getElementById('successMessage');
+        if (successMsg) {
+            setTimeout(function() {
+                successMsg.style.display = 'none';
+            }, 3000);
+        }
+    });
+</script> 
