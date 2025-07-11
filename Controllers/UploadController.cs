@@ -12,9 +12,13 @@ namespace wedding_memory.Controllers
 {
     public class UploadController : Controller
     {
-        private readonly string bucketName = "wedding-memory-46705.firebasestorage.app"; // Firebase Storage bucket adını buraya yaz
+        private readonly string bucketName = "wedding-memory-46705.firebasestorage.app";
         private readonly FirestoreDb _firestore;
         private readonly GoogleCredential _credential;
+        
+        // Dosya sınırlamaları
+        private const long MaxFileSize = 200 * 1024 * 1024; // 200MB
+        private readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".mp4", ".mov", ".avi", ".mkv", ".webm" };
 
         public UploadController()
         {
@@ -53,6 +57,7 @@ namespace wedding_memory.Controllers
                 ViewBag.BrideName = wedding.BrideName;
                 ViewBag.GroomName = wedding.GroomName;
                 ViewBag.Theme = wedding.Theme ?? "classic";
+                ViewBag.BackgroundImageUrl = wedding.BackgroundImageUrl;
             }
             ViewBag.WeddingId = id;
             return View();
@@ -68,6 +73,7 @@ namespace wedding_memory.Controllers
                 ViewBag.BrideName = wedding.BrideName;
                 ViewBag.GroomName = wedding.GroomName;
                 ViewBag.Theme = wedding.Theme ?? "classic";
+                ViewBag.BackgroundImageUrl = wedding.BackgroundImageUrl;
             }
             ViewBag.WeddingId = id;
 
@@ -83,16 +89,48 @@ namespace wedding_memory.Controllers
                 return View();
             }
 
-            var storage = StorageClient.Create(_credential);
+            // Dosya kontrolü
             foreach (var file in files)
             {
-                var objectName = $"{id}/{userName}/{Path.GetFileName(file.FileName)}";
-                using (var stream = file.OpenReadStream())
+                if (file.Length > MaxFileSize)
                 {
-                    await storage.UploadObjectAsync(bucketName, objectName, file.ContentType, stream);
+                    ViewBag.Error = $"Dosya boyutu çok büyük: {file.FileName}. Maksimum 200MB olmalıdır.";
+                    return View();
+                }
+
+                var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (!AllowedExtensions.Contains(extension))
+                {
+                    ViewBag.Error = $"Desteklenmeyen dosya türü: {file.FileName}. Sadece JPG, PNG, GIF, WEBP, MP4, MOV, AVI, MKV, WEBM dosyaları kabul edilir.";
+                    return View();
                 }
             }
-            ViewBag.Success = "Dosyalar başarıyla yüklendi!";
+
+            try
+            {
+                var storage = StorageClient.Create(_credential);
+                var uploadedFiles = new List<string>();
+
+                foreach (var file in files)
+                {
+                    var objectName = $"{id}/{userName}/{DateTime.UtcNow:yyyyMMdd_HHmmss}_{Path.GetFileName(file.FileName)}";
+                    using (var stream = file.OpenReadStream())
+                    {
+                        await storage.UploadObjectAsync(bucketName, objectName, file.ContentType, stream);
+                        uploadedFiles.Add(file.FileName);
+                    }
+                }
+                
+                ViewBag.Success = $"{uploadedFiles.Count} dosya başarıyla yüklendi!";
+                ViewBag.UploadedFiles = uploadedFiles;
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Dosya yükleme sırasında bir hata oluştu. Lütfen tekrar deneyin.";
+                // Log the error for debugging
+                Console.WriteLine($"Upload error: {ex.Message}");
+            }
+            
             return View();
         }
     }

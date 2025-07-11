@@ -3,9 +3,10 @@
     var theme = ViewBag.Theme as string ?? "classic";
 }
 
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* Tema CSS'leri */
-.theme-classic .wedding-title { color: #2d6cdf; }
+.theme-classic .wedding-title { color: #0d47a1 !important; }
 .theme-classic .wedding-subtitle { color: #0d6efd; }
 .theme-classic .btn-primary { 
     background-color: #0d6efd; 
@@ -13,7 +14,7 @@
 }
 .theme-classic .card { border-color: #dee2e6; }
 
-.theme-romantic .wedding-title { color: #e91e63; }
+.theme-romantic .wedding-title { color: #c2185b !important; }
 .theme-romantic .wedding-subtitle { color: #f06292; }
 .theme-romantic .btn-primary { 
     background-color: #e91e63; 
@@ -24,7 +25,7 @@
     background: linear-gradient(135deg, #fff5f8 0%, #ffeef7 100%); 
 }
 
-.theme-elegant .wedding-title { color: #9c27b0; }
+.theme-elegant .wedding-title { color: #6a1b9a !important; }
 .theme-elegant .wedding-subtitle { color: #ba68c8; }
 .theme-elegant .btn-primary { 
     background-color: #9c27b0; 
@@ -35,7 +36,7 @@
     background: linear-gradient(135deg, #faf5ff 0%, #f3e5f5 100%); 
 }
 
-.theme-modern .wedding-title { color: #2196f3; }
+.theme-modern .wedding-title { color: #1565c0 !important; }
 .theme-modern .wedding-subtitle { color: #64b5f6; }
 .theme-modern .btn-primary { 
     background-color: #2196f3; 
@@ -59,38 +60,187 @@
     background-color: #1976d2; 
     border-color: #1976d2; 
 }
+
+/* Dosya önizleme stilleri */
+.file-preview {
+    max-width: 150px;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 5px;
+    border: 2px solid #dee2e6;
+}
+
+.file-info {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+.progress {
+    height: 25px;
+    border-radius: 12px;
+}
+
+.upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    border-color: #0d6efd;
+    background-color: #f8f9fa;
+}
+
+.upload-area.dragover {
+    border-color: #0d6efd;
+    background-color: #e3f2fd;
+}
+
+.upload-bg {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+    pointer-events: none;
+    transition: background-image 0.3s;
+}
+.upload-content { position: relative; z-index: 1; }
+
+.theme-classic .wedding-title, .theme-romantic .wedding-title, .theme-elegant .wedding-title, .theme-modern .wedding-title,
+.theme-classic .wedding-subtitle, .theme-romantic .wedding-subtitle, .theme-elegant .wedding-subtitle, .theme-modern .wedding-subtitle,
+.text-with-shadow {
+    text-shadow: 0 2px 8px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.18);
+}
+
+.wedding-title {
+    font-family: 'Great Vibes', 'Dancing Script', cursive !important;
+    font-size: 3.2rem;
+    letter-spacing: 0.02em;
+    font-weight: 400 !important;
+    margin-bottom: 0.5rem;
+}
+@@media (min-width: 400px) {
+    .wedding-title {
+        font-size: 2.8rem;
+    }
+}
+@@media (min-width: 576px) {
+    .wedding-title {
+        font-size: 4.6rem;
+    }
+}
+@@media (min-width: 768px) {
+    .wedding-title {
+        font-size: 5.6rem;
+    }
+}
+@@media (min-width: 992px) {
+    .wedding-title {
+        font-size: 6.6rem;
+    }
+}
+.wedding-subtitle, .wedding-desc {
+    font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif !important;
+}
 </style>
 
-<div class="pt-5">
+@if (!string.IsNullOrEmpty(ViewBag.BackgroundImageUrl as string))
+{
+    <div class="upload-bg"></div>
+    <style>
+        .upload-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+            background-image: url('@ViewBag.BackgroundImageUrl');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            opacity: 0.35;
+            pointer-events: none;
+            transition: background-image 0.3s;
+        }
+        @@media (max-width: 768px) {
+            .upload-bg {
+                background-position: center top;
+                background-size: cover;
+            }
+        }
+    </style>
+}
+
+<div class="pt-5 upload-content">
 <div class="container d-flex justify-content-center align-items-center pt-5 pb-5 theme-@theme">
     <div class="row w-100 justify-content-center">
         <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
             <div class="text-center mb-3">
-                <h1 class="wedding-title-responsive text-break wedding-title">@ViewBag.BrideName &amp; @ViewBag.GroomName</h1>
-                <h2 class="wedding-subtitle-responsive wedding-subtitle">Düğünümüze Hoşgeldiniz</h2>
-                <div class="mb-1" style="font-size:1.1rem; color:#222;">Mutluluğumuzu bizimle paylaştığınız için teşekkür ederiz.</div>
-                <div class="mb-3" style="font-size:1.1rem; color:#222;">Birlikte nice güzel anılara!</div>
+                <h1 class="wedding-title text-with-shadow">@ViewBag.BrideName &amp; @ViewBag.GroomName</h1>
+                <h2 class="wedding-subtitle-responsive wedding-subtitle text-with-shadow">Düğünümüze Hoşgeldiniz</h2>
+                <div class="mb-1 text-with-shadow wedding-desc" style="font-size:1.1rem; color:#222;">Mutluluğumuzu bizimle paylaştığınız için teşekkür ederiz.</div>
+                <div class="mb-3 text-with-shadow wedding-desc" style="font-size:1.1rem; color:#222;">Birlikte nice güzel anılara!</div>
             </div>
             <div class="card shadow-lg border-0 w-100">
                 <div class="card-body p-4">
                     <h5 class="text-center mb-4 wedding-subtitle" style="font-weight:600;">Yüklemeye Başla!</h5>
+                    
                     @if (ViewBag.Error != null)
                     {
                         <div class="alert alert-danger">@ViewBag.Error</div>
                     }
                     @if (ViewBag.Success != null)
                     {
-                        <div class="alert alert-success" id="successMessage">@ViewBag.Success</div>
+                        <div class="alert alert-success" id="successMessage">
+                            @ViewBag.Success
+                            @if (ViewBag.UploadedFiles != null)
+                            {
+                                <div class="mt-2">
+                                    <strong>Yüklenen dosyalar:</strong>
+                                    <ul class="mb-0 mt-1">
+                                        @foreach (var file in ViewBag.UploadedFiles)
+                                        {
+                                            <li>@file</li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        </div>
                     }
+                    
                     <form asp-action="Index" method="post" enctype="multipart/form-data" id="uploadForm">
                         <div class="mb-3">
                             <input type="text" name="userName" class="form-control form-control-lg" placeholder="Adınızı girin" required />
                         </div>
+                        
                         <div class="mb-3">
-                            <input type="file" name="files" class="form-control" multiple required />
+                            <div class="upload-area" id="uploadArea">
+                                <i class="fas fa-cloud-upload-alt fa-2x mb-2" style="color: #6c757d;"></i>
+                                <p class="mb-2">Dosyaları buraya sürükleyin veya tıklayarak seçin</p>
+                                <p class="small text-muted mb-0">Desteklenen formatlar: JPG, PNG, GIF, WEBP, MP4, MOV, AVI, MKV, WEBM (Maksimum 200MB)</p>
+                                <input type="file" name="files" class="form-control d-none" multiple required id="fileInput" accept=".jpg,.jpeg,.png,.gif,.webp,.mp4,.mov,.avi,.mkv,.webm" />
+                            </div>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2 fs-5">Yükle</button>
-                        <div id="loadingMessage" class="alert alert-info mt-3 text-center" style="display:none;">Lütfen bekleyiniz, dosyalar yükleniyor...</div>
+                        
+                        <div id="filePreview" class="mb-3" style="display: none;">
+                            <h6>Seçilen Dosyalar:</h6>
+                            <div id="previewContainer" class="d-flex flex-wrap"></div>
+                        </div>
+                        
+                        <div id="progressContainer" class="mb-3" style="display: none;">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <div class="text-center mt-2" id="progressText">Yükleniyor...</div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 py-2 fs-5" id="submitBtn">Yükle</button>
                     </form>
                 </div>
             </div>
@@ -98,22 +248,120 @@
         </div>
     </div>
 </div>
-<div class="pt-5"></div>
-<div class="text-center mt-5" style="color:#888; font-size:1rem;">
+<div class="text-center" style="color:#888; font-size:1rem;">
     Bir <a href="https://www.instagram.com/berkayzngn11/" target="_blank">Berkay Zengin</a> projesidir.
 </div>
 
 <script>
-    document.getElementById('uploadForm').addEventListener('submit', function() {
-        document.getElementById('loadingMessage').style.display = 'block';
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    const previewContainer = document.getElementById('previewContainer');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.querySelector('.progress-bar');
+    const progressText = document.getElementById('progressText');
+    const submitBtn = document.getElementById('submitBtn');
+    const uploadForm = document.getElementById('uploadForm');
+
+    // Drag & Drop işlemleri
+    uploadArea.addEventListener('click', () => fileInput.click());
+    
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
     });
-    // Başarı mesajını 3 saniye sonra gizle
-    window.addEventListener('DOMContentLoaded', function() {
-        var successMsg = document.getElementById('successMessage');
-        if (successMsg) {
-            setTimeout(function() {
-                successMsg.style.display = 'none';
-            }, 3000);
+    
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        fileInput.files = e.dataTransfer.files;
+        handleFileSelection();
+    });
+
+    fileInput.addEventListener('change', handleFileSelection);
+
+    function handleFileSelection() {
+        const files = fileInput.files;
+        if (files.length > 0) {
+            previewContainer.innerHTML = '';
+            filePreview.style.display = 'block';
+            
+            Array.from(files).forEach((file, index) => {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'text-center me-3 mb-2';
+                
+                const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                
+                if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        fileDiv.innerHTML = `
+                            <img src="${e.target.result}" class="file-preview" alt="${file.name}">
+                            <div class="file-info">${file.name}<br>${fileSize} MB</div>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    fileDiv.innerHTML = `
+                        <div class="file-preview d-flex align-items-center justify-content-center bg-light">
+                            <i class="fas fa-file fa-2x text-muted"></i>
+                        </div>
+                        <div class="file-info">${file.name}<br>${fileSize} MB</div>
+                    `;
+                }
+                
+                previewContainer.appendChild(fileDiv);
+            });
+        } else {
+            filePreview.style.display = 'none';
         }
+    }
+
+    // Form submit işlemi
+    uploadForm.addEventListener('submit', function(e) {
+        const files = fileInput.files;
+        if (files.length === 0) {
+            e.preventDefault();
+            alert('Lütfen en az bir dosya seçin.');
+            return;
+        }
+
+        // Dosya boyutu kontrolü
+        for (let file of files) {
+            if (file.size > 200 * 1024 * 1024) { // 200MB
+                e.preventDefault();
+                alert(`Dosya boyutu çok büyük: ${file.name}. Maksimum 200MB olmalıdır.`);
+                return;
+            }
+        }
+
+        // Progress bar göster
+        progressContainer.style.display = 'block';
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yükleniyor...';
+        
+        // Simüle progress (gerçek progress için AJAX kullanılabilir)
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            progressBar.style.width = progress + '%';
+            progressText.textContent = `Yükleniyor... %${Math.round(progress)}`;
+        }, 200);
     });
+
+    // Başarı mesajını 5 saniye sonra gizle
+    const successMsg = document.getElementById('successMessage');
+    if (successMsg) {
+        setTimeout(function() {
+            successMsg.style.display = 'none';
+        }, 5000);
+    }
+});
 </script> 

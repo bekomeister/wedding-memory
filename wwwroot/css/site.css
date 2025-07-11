@@ -96,3 +96,10 @@ body {
   --modern-secondary: #64b5f6;
   --modern-accent: #bbdefb;
 }
+
+@media (max-width: 768px) {
+    .upload-bg {
+        background-position: center top;
+        background-size: cover;
+    }
+}

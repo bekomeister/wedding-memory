@@ -17,15 +17,16 @@ namespace wedding_memory.Controllers
         // Basit şifre kontrolü için
         private const string AdminPassword = "beko123";
         private readonly FirestoreDb _firestore;
+        private readonly GoogleCredential _credential;
 
         public AdminController()
         {
             var credentialPath = GetFirebaseCredentialPath();
-            var credential = GoogleCredential.FromFile(credentialPath);
+            _credential = GoogleCredential.FromFile(credentialPath);
             var builder = new FirestoreDbBuilder
             {
                 ProjectId = "wedding-memory-46705",
-                Credential = credential
+                Credential = _credential
             };
             _firestore = builder.Build();
         }
@@ -132,7 +133,7 @@ namespace wedding_memory.Controllers
             if (HttpContext.Session.GetString("IsAdmin") != "true")
                 return RedirectToAction("Login");
             var storage = StorageClient.Create();
-            string bucketName = "wedding-memory-46705.firebasestorage.com";
+            string bucketName = "wedding-memory-46705.firebasestorage.app";
             var files = new List<string>();
             foreach (var obj in storage.ListObjects(bucketName, id + "/"))
             {
@@ -142,6 +143,61 @@ namespace wedding_memory.Controllers
             }
             ViewBag.WeddingId = id;
             return View(files);
+        }
+
+        // Arkaplan görseli yükleme
+        [HttpPost]
+        public async Task<IActionResult> UploadBackground(string id, IFormFile backgroundImage)
+        {
+            if (HttpContext.Session.GetString("IsAdmin") != "true")
+                return RedirectToAction("Login");
+            if (backgroundImage == null || backgroundImage.Length == 0)
+                return RedirectToAction("Index");
+
+            // Sadece resim dosyalarına izin ver
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(backgroundImage.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(ext))
+                return RedirectToAction("Index");
+
+            // Görsel oranı kontrolü kaldırıldı, her türlü görsel yüklenebilir
+
+            // Firebase Storage'a yükle
+            var storage = StorageClient.Create(_credential);
+            string bucketName = "wedding-memory-46705.firebasestorage.app";
+            string objectName = $"{id}/background{ext}";
+            using (var stream = backgroundImage.OpenReadStream())
+            {
+                await storage.UploadObjectAsync(bucketName, objectName, backgroundImage.ContentType, stream, new UploadObjectOptions { PredefinedAcl = PredefinedObjectAcl.PublicRead });
+            }
+            string url = $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(objectName)}?alt=media&t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+            // Firestore'a URL'i kaydet
+            var docRef = _firestore.Collection("weddings").Document(id);
+            await docRef.UpdateAsync("BackgroundImageUrl", url);
+
+            return RedirectToAction("Index");
+        }
+
+        // Çift silme
+        [HttpPost]
+        public async Task<IActionResult> DeleteWedding(string id)
+        {
+            if (HttpContext.Session.GetString("IsAdmin") != "true")
+                return RedirectToAction("Login");
+            var docRef = _firestore.Collection("weddings").Document(id);
+            await docRef.DeleteAsync();
+
+            // Firebase Storage'dan ilgili wedding id klasöründeki tüm dosyaları sil
+            var storage = StorageClient.Create(_credential);
+            string bucketName = "wedding-memory-46705.firebasestorage.app";
+            var objects = storage.ListObjects(bucketName, id + "/");
+            foreach (var obj in objects)
+            {
+                await storage.DeleteObjectAsync(bucketName, obj.Name);
+            }
+
+            return RedirectToAction("Index");
         }
     }
 } 

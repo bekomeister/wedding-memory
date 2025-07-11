@@ -38,10 +38,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
+// Railway'de HTTPS redirection'ı kaldırıyoruz çünkü Railway kendi SSL'ini yönetiyor
+// if (app.Environment.IsDevelopment())
+// {
+//     app.UseHttpsRedirection();
+// }
 app.UseRouting();
 app.UseSession();
 

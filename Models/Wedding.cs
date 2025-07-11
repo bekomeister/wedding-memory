@@ -22,5 +22,8 @@ namespace wedding_memory.Models
 
         [FirestoreProperty]
         public string? Theme { get; set; } = "classic"; // Varsayılan tema
+
+        [FirestoreProperty]
+        public string? BackgroundImageUrl { get; set; } // Arkaplan görseli
     }
 } 

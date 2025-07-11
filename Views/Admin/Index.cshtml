@@ -47,6 +47,10 @@
     </form>
 
     <h3 class="mt-5 mb-3">Mevcut Çiftler</h3>
+    @if (TempData["BackgroundError"] != null)
+    {
+        <div class="alert alert-danger">@TempData["BackgroundError"]</div>
+    }
     <div class="table-responsive">
     <table class="table table-bordered table-striped align-middle">
         <thead>
@@ -97,6 +101,27 @@
                         </td>
                         <td class="text-center">
                             <a href="/Admin/Qr/@wedding.Id" class="btn btn-outline-secondary btn-sm w-100">QR Kod</a>
+                            <form asp-action="DeleteWedding" method="post" style="display:inline-block; margin-top:4px;" onsubmit="return confirm('Çifti silmek istediğinize emin misiniz?');">
+                                <input type="hidden" name="id" value="@wedding.Id" />
+                                <button type="submit" class="btn btn-sm btn-danger w-100">Sil</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" class="bg-light p-2">
+                            <form asp-action="UploadBackground" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
+                                <input type="hidden" name="id" value="@wedding.Id" />
+                                <input type="file" name="backgroundImage" accept=".jpg,.jpeg,.png,.webp" class="form-control form-control-sm" style="max-width:220px;" />
+                                <button type="submit" class="btn btn-sm btn-outline-success">Arkaplan Yükle</button>
+                                @if (!string.IsNullOrEmpty(wedding.BackgroundImageUrl))
+                                {
+                                    <img src="@wedding.BackgroundImageUrl" alt="Arkaplan" style="max-width:60px; max-height:40px; border-radius:6px; border:1px solid #ccc; margin-left:10px;" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted small ms-2">Varsayılan (beyaz)</span>
+                                }
+                            </form>
                         </td>
                     </tr>
                     i++;
