@@ -78,8 +78,22 @@
 }
 
 .progress {
+    width: 100%;
+    min-width: 120px;
+    max-width: 100%;
     height: 25px;
     border-radius: 12px;
+    margin: 0 auto;
+}
+
+@media (max-width: 576px) {
+    .progress {
+        height: 18px;
+        min-width: 80px;
+    }
+    .progress-bar {
+        font-size: 0.9rem;
+    }
 }
 
 .upload-area {
