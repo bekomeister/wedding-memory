@@ -50,6 +50,10 @@ namespace wedding_memory.Controllers
         [HttpGet("/Upload/{id}")]
         public async Task<IActionResult> Index(string id)
         {
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction("Error", "Home");
+            }
             var doc = await _firestore.Collection("weddings").Document(id).GetSnapshotAsync();
             if (doc.Exists)
             {
@@ -66,6 +70,10 @@ namespace wedding_memory.Controllers
         [HttpPost("/Upload/{id}")]
         public async Task<IActionResult> Index(string id, string userName, List<IFormFile> files)
         {
+            if (string.IsNullOrEmpty(id))
+            {
+                return RedirectToAction("Error", "Home");
+            }
             var doc = await _firestore.Collection("weddings").Document(id).GetSnapshotAsync();
             if (doc.Exists)
             {

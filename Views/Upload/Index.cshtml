@@ -214,7 +214,7 @@
                         </div>
                     }
                     
-                    <form asp-action="Index" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <form asp-action="Index" asp-route-id="@ViewBag.WeddingId" method="post" enctype="multipart/form-data" id="uploadForm">
                         <div class="mb-3">
                             <input type="text" name="userName" class="form-control form-control-lg" placeholder="Adınızı girin" required />
                         </div>
