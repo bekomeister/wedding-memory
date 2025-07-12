@@ -136,14 +136,14 @@
 
 .wedding-title {
     font-family: 'Great Vibes', 'Dancing Script', cursive !important;
-    font-size: 3.2rem;
+    font-size: 2.7rem;
     letter-spacing: 0.02em;
     font-weight: 400 !important;
     margin-bottom: 0.5rem;
 }
 @@media (min-width: 400px) {
     .wedding-title {
-        font-size: 3.8rem;
+        font-size: 2.8rem;
     }
 }
 @@media (min-width: 576px) {
@@ -198,7 +198,7 @@
             <div class="text-center mb-3">
                 <h1 class="wedding-title text-with-shadow">@ViewBag.BrideName &amp; @ViewBag.GroomName</h1>
                 <h2 class="wedding-subtitle-responsive wedding-subtitle text-with-shadow">Düğünümüze Hoşgeldiniz</h2>
-                <div class="mb-1 text-with-shadow wedding-desc" style="font-size:1.1rem; color:#222;">Mutluluğumuzu bizimle paylaştığınız için teşekkür ederiz.</div>
+                <div class="mb-1 text-with-shadow wedding-desc" style="font-size:1.1rem; color:#222;">Mutluluğumuzu bizimle paylaştığınız için teşekkürlerimizi sunarız.</div>
                 <div class="mb-3 text-with-shadow wedding-desc" style="font-size:1.1rem; color:#222;">Birlikte nice güzel anılara!</div>
             </div>
             <div class="card shadow-lg border-0 w-100">
@@ -230,14 +230,14 @@
                     
                     <form asp-action="Index" asp-route-id="@ViewBag.WeddingId" method="post" enctype="multipart/form-data" id="uploadForm">
                         <div class="mb-3">
-                            <input type="text" name="userName" class="form-control form-control-lg" placeholder="Adınızı girin" required />
+                            <input type="text" name="userName" class="form-control form-control-lg" placeholder="Ad soyad lütfen" required />
                         </div>
                         
                         <div class="mb-3">
                             <div class="upload-area" id="uploadArea">
                                 <i class="fas fa-cloud-upload-alt fa-2x mb-2" style="color: #6c757d;"></i>
-                                <p class="mb-2">Dosyaları buraya sürükleyin veya tıklayarak seçin</p>
-                                <p class="small text-danger mb-0">Bir seferde en fazla 15 dosya yükleyebilirsiniz.</p>
+                                <p class="mb-2">Dosyaları buraya sürükle veya tıklayarak seç</p>
+                                <p class="small text-danger mb-0">Bir seferde en fazla 15 dosya yükleyebilirsin.</p>
                                 <input type="file" name="files" class="form-control d-none" multiple required id="fileInput" accept=".jpg,.jpeg,.png,.gif,.webp,.mp4,.mov,.avi,.mkv,.webm" />
                             </div>
                         </div>
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleFileSelection() {
         const files = fileInput.files;
         if (files.length > 15) {
-            alert('Bir seferde en fazla 15 dosya yükleyebilirsiniz.');
+            alert('Bir seferde en fazla 15 dosya yükleyebilirsin.');
             fileInput.value = '';
             previewContainer.innerHTML = '';
             filePreview.style.display = 'none';
@@ -350,11 +350,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const files = fileInput.files;
         const userName = uploadForm.querySelector('input[name="userName"]').value;
         if (files.length === 0) {
-            alert('Lütfen en az bir dosya seçin.');
+            alert('Lütfen en az bir dosya seç.');
             return;
         }
         if (!userName || userName.trim() === '') {
-            alert('Lütfen isminizi girin.');
+            alert('Lütfen adını ve soyadını yaz.');
             return;
         }
         progressContainer.style.display = 'block';
