@@ -339,35 +339,57 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Form submit işlemi
     uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
         const files = fileInput.files;
+        const userName = uploadForm.querySelector('input[name="userName"]').value;
         if (files.length === 0) {
-            e.preventDefault();
             alert('Lütfen en az bir dosya seçin.');
             return;
         }
-
-        // Dosya boyutu kontrolü
-        for (let file of files) {
-            if (file.size > 200 * 1024 * 1024) { // 200MB
-                e.preventDefault();
-                alert(`Dosya boyutu çok büyük: ${file.name}. Maksimum 200MB olmalıdır.`);
-                return;
-            }
+        if (!userName || userName.trim() === '') {
+            alert('Lütfen isminizi girin.');
+            return;
         }
-
-        // Progress bar göster
         progressContainer.style.display = 'block';
+        progressBar.style.width = '0%';
+        progressText.textContent = 'Yükleniyor... %0';
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yükleniyor...';
-        
-        // Simüle progress (gerçek progress için AJAX kullanılabilir)
-        let progress = 0;
-        const interval = setInterval(() => {
-            progress += Math.random() * 15;
-            if (progress > 90) progress = 90;
-            progressBar.style.width = progress + '%';
-            progressText.textContent = `Yükleniyor... %${Math.round(progress)}`;
-        }, 200);
+
+        const formData = new FormData();
+        formData.append('userName', userName);
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+        }
+        const uploadUrl = uploadForm.action;
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', uploadUrl, true);
+        xhr.upload.onprogress = function(e) {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                progressBar.style.width = percent + '%';
+                progressText.textContent = 'Yükleniyor... %' + percent;
+            }
+        };
+        xhr.onload = function() {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Yükle';
+            if (xhr.status === 200) {
+                progressBar.style.width = '100%';
+                progressText.textContent = 'Yükleme tamamlandı!';
+                setTimeout(() => { window.location.reload(); }, 1200);
+            } else {
+                progressText.textContent = 'Yükleme sırasında hata oluştu.';
+                alert('Yükleme sırasında hata oluştu. Lütfen tekrar deneyin.');
+            }
+        };
+        xhr.onerror = function() {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Yükle';
+            progressText.textContent = 'Yükleme sırasında hata oluştu.';
+            alert('Yükleme sırasında hata oluştu. Lütfen tekrar deneyin.');
+        };
+        xhr.send(formData);
     });
 
     // Başarı mesajını 5 saniye sonra gizle
