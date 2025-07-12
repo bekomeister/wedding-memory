@@ -97,6 +97,12 @@ namespace wedding_memory.Controllers
                 return View();
             }
 
+            if (files.Count > 15)
+            {
+                ViewBag.Error = "Bir seferde en fazla 15 dosya yükleyebilirsiniz.";
+                return View();
+            }
+
             // Dosya kontrolü
             foreach (var file in files)
             {
