@@ -151,6 +151,9 @@ firebase-key.json
 firebase-debug.log
 firebase-debug.*.log
 
+# Admin password configuration - CRITICAL: Never commit passwords!
+appsettings.Development.json
+
 # Environment files
 .env
 .env.local

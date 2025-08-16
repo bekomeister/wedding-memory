@@ -14,13 +14,17 @@ namespace wedding_memory.Controllers
 {
     public class AdminController : Controller
     {
-        // Basit şifre kontrolü için
-        private const string AdminPassword = "beko123";
+        // Admin şifresi configuration'dan alınır
+        private readonly string _adminPassword;
         private readonly FirestoreDb _firestore;
         private readonly GoogleCredential _credential;
 
-        public AdminController()
+        public AdminController(IConfiguration configuration)
         {
+            _adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? 
+                           configuration["AdminPassword"] ?? 
+                           "beko123";
+            
             var credentialPath = GetFirebaseCredentialPath();
             _credential = GoogleCredential.FromFile(credentialPath);
             var builder = new FirestoreDbBuilder
@@ -53,7 +57,7 @@ namespace wedding_memory.Controllers
         [HttpPost]
         public IActionResult Login(string password)
         {
-            if (password == AdminPassword)
+            if (password == _adminPassword)
             {
                 // Giriş başarılı, session ile işaretle
                 HttpContext.Session.SetString("IsAdmin", "true");

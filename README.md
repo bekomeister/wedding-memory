@@ -75,9 +75,22 @@ Firebase key JSON dosyanızın tüm içeriğini buraya yapıştırın.
 
 ## Güvenlik Notları
 
-- Admin şifresini production'da değiştirin
-- Firebase key'inizi güvenli tutun
-- HTTPS kullanın
+- **Admin şifresini production'da değiştirin**
+- **Firebase key'inizi güvenli tutun**
+- **HTTPS kullanın**
+- **Environment variable kullanın:** `ADMIN_PASSWORD=your_secure_password`
+
+## Environment Variables
+
+Production'da aşağıdaki environment variable'ları ayarlayın:
+
+```bash
+# Admin paneli şifresi
+ADMIN_PASSWORD=your_secure_password_here
+
+# Firebase key
+FIREBASE_KEY_JSON={"type":"service_account",...}
+```
 
 ## Destek
 
