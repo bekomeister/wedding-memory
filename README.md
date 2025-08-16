@@ -39,11 +39,15 @@ Bu uygulama, düğün fotoğraflarını paylaşmak için tasarlanmış bir ASP.N
 ### 4. Environment Variables
 Aşağıdaki environment variable'ları ekleyin:
 
-```
+```bash
+# Firebase service account key (zorunlu)
 FIREBASE_KEY_JSON={"type":"service_account","project_id":"wedding-memory-46705",...}
+
+# Admin paneli şifresi (zorunlu - güvenlik için)
+ADMIN_PASSWORD=your_secure_admin_password_here
 ```
 
-Firebase key JSON dosyanızın tüm içeriğini buraya yapıştırın.
+**Önemli:** Firebase key JSON dosyanızın tüm içeriğini `FIREBASE_KEY_JSON` olarak yapıştırın.
 
 ### 5. Build & Deploy
 - "Create Web Service" butonuna tıklayın
@@ -59,13 +63,14 @@ Firebase key JSON dosyanızın tüm içeriğini buraya yapıştırın.
 ### Kurulum
 1. Repository'yi klonlayın
 2. `firebase-key.json` dosyasını proje root'una ekleyin
-3. `dotnet restore` komutunu çalıştırın
-4. `dotnet run` ile uygulamayı başlatın
+3. `appsettings.Development.json` dosyasını oluşturun (admin şifresi için)
+4. `dotnet restore` komutunu çalıştırın
+5. `dotnet run` ile uygulamayı başlatın
 
 ## Kullanım
 
 ### Admin Paneli
-- `/Admin/Login` - Admin girişi (şifre: beko123)
+- `/Admin/Login` - Admin girişi (şifre environment variable'dan alınır)
 - `/Admin` - Düğün çiftleri listesi
 - `/Admin/Qr/{id}` - QR kod oluşturma
 - `/Admin/Files/{id}` - Yüklenen dosyaları görüntüleme
