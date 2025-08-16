@@ -306,36 +306,6 @@ namespace wedding_memory.Controllers
             return RedirectToAction("Index");
         }
 
-        // Migration: Mevcut çiftlerin EventType değerlerini güncelle
-        [HttpPost]
-        public async Task<IActionResult> MigrateEventTypes()
-        {
-            if (HttpContext.Session.GetString("IsAdmin") != "true")
-                return RedirectToAction("Login");
 
-            try
-            {
-                var snapshot = await _firestore.Collection("weddings").GetSnapshotAsync();
-                var updatedCount = 0;
-
-                foreach (var doc in snapshot.Documents)
-                {
-                    var wedding = doc.ConvertTo<Wedding>();
-                    if (string.IsNullOrEmpty(wedding.EventType))
-                    {
-                        await doc.Reference.UpdateAsync("EventType", "wedding");
-                        updatedCount++;
-                    }
-                }
-
-                TempData["MigrationSuccess"] = $"{updatedCount} çiftin EventType değeri güncellendi.";
-            }
-            catch (Exception ex)
-            {
-                TempData["MigrationError"] = $"Migration sırasında hata oluştu: {ex.Message}";
-            }
-
-            return RedirectToAction("Index");
-        }
     }
 } 

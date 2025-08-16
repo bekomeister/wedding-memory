@@ -65,27 +65,10 @@
     {
         <div class="alert alert-danger">@TempData["Error"]</div>
     }
-    @if (TempData["MigrationSuccess"] != null)
-    {
-        <div class="alert alert-success">@TempData["MigrationSuccess"]</div>
-    }
-    @if (TempData["MigrationError"] != null)
-    {
-        <div class="alert alert-danger">@TempData["MigrationError"]</div>
-    }
     @if (TempData["BackgroundError"] != null)
     {
         <div class="alert alert-danger">@TempData["BackgroundError"]</div>
     }
-    
-    <div class="mb-3">
-        <form method="post" asp-action="MigrateEventTypes" style="display:inline-block;">
-            <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Mevcut çiftlerin EventType değerlerini güncellemek istediğinize emin misiniz?')">
-                🔄 EventType Migration
-            </button>
-        </form>
-        <small class="text-muted ms-2">Mevcut çiftlerin EventType değerlerini günceller</small>
-    </div>
     <div class="table-responsive">
     <table class="table table-bordered table-striped align-middle">
         <thead>
