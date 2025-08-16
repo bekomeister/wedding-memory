@@ -25,5 +25,8 @@ namespace wedding_memory.Models
 
         [FirestoreProperty]
         public string? BackgroundImageUrl { get; set; } // Arkaplan görseli
+
+        [FirestoreProperty]
+        public string? EventType { get; set; } = "wedding"; // Etkinlik türü
     }
 } 

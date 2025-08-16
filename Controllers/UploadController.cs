@@ -62,6 +62,7 @@ namespace wedding_memory.Controllers
                 ViewBag.GroomName = wedding.GroomName;
                 ViewBag.Theme = wedding.Theme ?? "classic";
                 ViewBag.BackgroundImageUrl = wedding.BackgroundImageUrl;
+                ViewBag.EventType = wedding.EventType ?? "wedding";
             }
             ViewBag.WeddingId = id;
             return View();
@@ -82,6 +83,7 @@ namespace wedding_memory.Controllers
                 ViewBag.GroomName = wedding.GroomName;
                 ViewBag.Theme = wedding.Theme ?? "classic";
                 ViewBag.BackgroundImageUrl = wedding.BackgroundImageUrl;
+                ViewBag.EventType = wedding.EventType ?? "wedding";
             }
             ViewBag.WeddingId = id;
 

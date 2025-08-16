@@ -81,7 +81,7 @@ namespace wedding_memory.Controllers
 
         // Yeni çift ekleme
         [HttpPost]
-        public async Task<IActionResult> AddWedding(string brideName, string groomName)
+        public async Task<IActionResult> AddWedding(string brideName, string groomName, string eventType)
         {
             if (HttpContext.Session.GetString("IsAdmin") != "true")
                 return RedirectToAction("Login");
@@ -92,7 +92,8 @@ namespace wedding_memory.Controllers
                 BrideName = brideName,
                 GroomName = groomName,
                 CreatedAt = DateTime.UtcNow,
-                Theme = "classic" // Varsayılan tema
+                Theme = "classic", // Varsayılan tema
+                EventType = eventType ?? "wedding" // Varsayılan etkinlik türü
             };
             await docRef.SetAsync(wedding);
             return RedirectToAction("Index");
@@ -107,6 +108,18 @@ namespace wedding_memory.Controllers
             
             var docRef = _firestore.Collection("weddings").Document(id);
             await docRef.UpdateAsync("Theme", theme);
+            return RedirectToAction("Index");
+        }
+
+        // Etkinlik türü güncelleme
+        [HttpPost]
+        public async Task<IActionResult> UpdateEventType(string id, string eventType)
+        {
+            if (HttpContext.Session.GetString("IsAdmin") != "true")
+                return RedirectToAction("Login");
+            
+            var docRef = _firestore.Collection("weddings").Document(id);
+            await docRef.UpdateAsync("EventType", eventType);
             return RedirectToAction("Index");
         }
 
@@ -195,6 +208,38 @@ namespace wedding_memory.Controllers
             foreach (var obj in objects)
             {
                 await storage.DeleteObjectAsync(bucketName, obj.Name);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        // Migration: Mevcut çiftlerin EventType değerlerini güncelle
+        [HttpPost]
+        public async Task<IActionResult> MigrateEventTypes()
+        {
+            if (HttpContext.Session.GetString("IsAdmin") != "true")
+                return RedirectToAction("Login");
+
+            try
+            {
+                var snapshot = await _firestore.Collection("weddings").GetSnapshotAsync();
+                var updatedCount = 0;
+
+                foreach (var doc in snapshot.Documents)
+                {
+                    var wedding = doc.ConvertTo<Wedding>();
+                    if (string.IsNullOrEmpty(wedding.EventType))
+                    {
+                        await doc.Reference.UpdateAsync("EventType", "wedding");
+                        updatedCount++;
+                    }
+                }
+
+                TempData["MigrationSuccess"] = $"{updatedCount} çiftin EventType değeri güncellendi.";
+            }
+            catch (Exception ex)
+            {
+                TempData["MigrationError"] = $"Migration sırasında hata oluştu: {ex.Message}";
             }
 
             return RedirectToAction("Index");

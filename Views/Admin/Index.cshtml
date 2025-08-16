@@ -34,11 +34,20 @@
     <h2 class="mb-4">Çift Ekle</h2>
     <form method="post" asp-action="AddWedding">
         <div class="row mb-3">
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <input type="text" name="brideName" class="form-control" placeholder="Gelin Adı" required />
             </div>
-            <div class="col-md-5">
+            <div class="col-md-3">
                 <input type="text" name="groomName" class="form-control" placeholder="Damat Adı" required />
+            </div>
+            <div class="col-md-3">
+                <select name="eventType" class="form-control" required>
+                    <option value="wedding">💒 Düğün</option>
+                    <option value="engagement">💍 Nişan</option>
+                    <option value="promise">🤝 Söz</option>
+                    <option value="circumcision">🎉 Sünnet</option>
+                    <option value="henna">🌺 Kına</option>
+                </select>
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-success w-100">Ekle</button>
@@ -47,10 +56,28 @@
     </form>
 
     <h3 class="mt-5 mb-3">Mevcut Çiftler</h3>
+    
+    @if (TempData["MigrationSuccess"] != null)
+    {
+        <div class="alert alert-success">@TempData["MigrationSuccess"]</div>
+    }
+    @if (TempData["MigrationError"] != null)
+    {
+        <div class="alert alert-danger">@TempData["MigrationError"]</div>
+    }
     @if (TempData["BackgroundError"] != null)
     {
         <div class="alert alert-danger">@TempData["BackgroundError"]</div>
     }
+    
+    <div class="mb-3">
+        <form method="post" asp-action="MigrateEventTypes" style="display:inline-block;">
+            <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Mevcut çiftlerin EventType değerlerini güncellemek istediğinize emin misiniz?')">
+                🔄 EventType Migration
+            </button>
+        </form>
+        <small class="text-muted ms-2">Mevcut çiftlerin EventType değerlerini günceller</small>
+    </div>
     <div class="table-responsive">
     <table class="table table-bordered table-striped align-middle">
         <thead>
@@ -62,6 +89,7 @@
                 <th class="text-center">Tema</th>
                 <th class="text-center">Yükleme Linki</th>
                 <th class="text-center">QR Kod</th>
+                <th class="text-center">Etkinlik Türü</th>
             </tr>
         </thead>
         <tbody>
@@ -106,9 +134,33 @@
                                 <button type="submit" class="btn btn-sm btn-danger w-100">Sil</button>
                             </form>
                         </td>
+                        <td class="text-center">
+                            <div class="dropdown">
+                                <button class="btn btn-outline-warning btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    @GetEventTypeDisplayName(wedding.EventType ?? "wedding")
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="updateEventType('@wedding.Id', 'wedding')">
+                                        💒 Düğün
+                                    </a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="updateEventType('@wedding.Id', 'engagement')">
+                                        💍 Nişan
+                                    </a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="updateEventType('@wedding.Id', 'promise')">
+                                        🤝 Söz
+                                    </a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="updateEventType('@wedding.Id', 'circumcision')">
+                                        🎉 Sünnet
+                                    </a></li>
+                                    <li><a class="dropdown-item d-flex align-items-center" href="#" onclick="updateEventType('@wedding.Id', 'henna')">
+                                        🌺 Kına
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </td>
                     </tr>
                     <tr>
-                        <td colspan="7" class="bg-light p-2">
+                        <td colspan="8" class="bg-light p-2">
                             <form asp-action="UploadBackground" method="post" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
                                 <input type="hidden" name="id" value="@wedding.Id" />
                                 <input type="file" name="backgroundImage" accept=".jpg,.jpeg,.png,.webp" class="form-control form-control-sm" style="max-width:220px;" />
@@ -129,7 +181,7 @@
             }
             else
             {
-                <tr><td colspan="7" class="text-center">Henüz çift eklenmedi.</td></tr>
+                <tr><td colspan="8" class="text-center">Henüz çift eklenmedi.</td></tr>
             }
         </tbody>
     </table>
@@ -145,6 +197,19 @@
             "elegant" => "✨ Zarif",
             "modern" => "🚀 Modern",
             _ => "🎨 Klasik"
+        };
+    }
+
+    public string GetEventTypeDisplayName(string eventType)
+    {
+        return eventType switch
+        {
+            "wedding" => "💒 Düğün",
+            "engagement" => "💍 Nişan",
+            "promise" => "🤝 Söz",
+            "circumcision" => "🎉 Sünnet",
+            "henna" => "🌺 Kına",
+            _ => "💒 Düğün"
         };
     }
 }
@@ -188,6 +253,28 @@ function updateTheme(weddingId, theme) {
     
     form.appendChild(idInput);
     form.appendChild(themeInput);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function updateEventType(weddingId, eventType) {
+    // Form oluştur ve gönder
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/Admin/UpdateEventType';
+    
+    const idInput = document.createElement('input');
+    idInput.type = 'hidden';
+    idInput.name = 'id';
+    idInput.value = weddingId;
+    
+    const eventTypeInput = document.createElement('input');
+    eventTypeInput.type = 'hidden';
+    eventTypeInput.name = 'eventType';
+    eventTypeInput.value = eventType;
+    
+    form.appendChild(idInput);
+    form.appendChild(eventTypeInput);
     document.body.appendChild(form);
     form.submit();
 }

@@ -3,6 +3,34 @@
     var theme = ViewBag.Theme as string ?? "classic";
 }
 
+@functions {
+    public string GetEventTypeWelcomeMessage(string eventType)
+    {
+        return eventType switch
+        {
+            "wedding" => "Düğünümüze Hoşgeldiniz",
+            "engagement" => "Nişanımıza Hoşgeldiniz",
+            "promise" => "Sözümüze Hoşgeldiniz",
+            "circumcision" => "Sünnetimize Hoşgeldiniz",
+            "henna" => "Kınamıza Hoşgeldiniz",
+            _ => "Düğünümüze Hoşgeldiniz"
+        };
+    }
+
+    public string GetEventTypeDescription(string eventType)
+    {
+        return eventType switch
+        {
+            "wedding" => "Mutluluğumuzu bizimle paylaştığınız için teşekkürlerimizi sunarız.",
+            "engagement" => "Nişan törenimizde bizimle olduğunuz için teşekkürlerimizi sunarız.",
+            "promise" => "Söz törenimizde bizimle olduğunuz için teşekkürlerimizi sunarız.",
+            "circumcision" => "Sünnet törenimizde bizimle olduğunuz için teşekkürlerimizi sunarız.",
+            "henna" => "Kına gecemizde bizimle olduğunuz için teşekkürlerimizi sunarız.",
+            _ => "Mutluluğumuzu bizimle paylaştığınız için teşekkürlerimizi sunarız."
+        };
+    }
+}
+
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* Tema CSS'leri */
@@ -197,8 +225,8 @@
         <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
             <div class="text-center mb-3">
                 <h1 class="wedding-title text-with-shadow">@ViewBag.BrideName &amp; @ViewBag.GroomName</h1>
-                <h2 class="wedding-subtitle-responsive wedding-subtitle text-with-shadow">Düğünümüze Hoşgeldiniz</h2>
-                <div class="mb-1 text-with-shadow wedding-desc" style="font-size:1.1rem; color:#222;">Mutluluğumuzu bizimle paylaştığınız için teşekkürlerimizi sunarız.</div>
+                <h2 class="wedding-subtitle-responsive wedding-subtitle text-with-shadow">@GetEventTypeWelcomeMessage(ViewBag.EventType as string)</h2>
+                <div class="mb-1 text-with-shadow wedding-desc" style="font-size:1.1rem; color:#222;">@GetEventTypeDescription(ViewBag.EventType as string)</div>
                 <div class="mb-3 text-with-shadow wedding-desc" style="font-size:1.1rem; color:#222;">Birlikte nice güzel anılara!</div>
             </div>
             <div class="card shadow-lg border-0 w-100">
