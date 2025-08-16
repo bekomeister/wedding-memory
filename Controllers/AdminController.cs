@@ -85,18 +85,111 @@ namespace wedding_memory.Controllers
         {
             if (HttpContext.Session.GetString("IsAdmin") != "true")
                 return RedirectToAction("Login");
-            var docRef = _firestore.Collection("weddings").Document();
-            var wedding = new Wedding
+
+            try
             {
-                Id = docRef.Id,
-                BrideName = brideName,
-                GroomName = groomName,
-                CreatedAt = DateTime.UtcNow,
-                Theme = "classic", // Varsayılan tema
-                EventType = eventType ?? "wedding" // Varsayılan etkinlik türü
-            };
-            await docRef.SetAsync(wedding);
+                // Benzersiz ID oluştur: gelin-damat-tarih
+                var baseId = $"{NormalizeName(brideName)}-{NormalizeName(groomName)}-{DateTime.UtcNow:yyyyMMdd}";
+                var uniqueId = await GenerateUniqueId(baseId);
+                
+                var docRef = _firestore.Collection("weddings").Document(uniqueId);
+                var wedding = new Wedding
+                {
+                    Id = uniqueId,
+                    BrideName = brideName,
+                    GroomName = groomName,
+                    CreatedAt = DateTime.UtcNow,
+                    Theme = "classic", // Varsayılan tema
+                    EventType = eventType ?? "wedding" // Varsayılan etkinlik türü
+                };
+                await docRef.SetAsync(wedding);
+                
+                TempData["Success"] = $"Çift başarıyla eklendi! ID: {uniqueId}";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Çift eklenirken hata oluştu: {ex.Message}";
+            }
+            
             return RedirectToAction("Index");
+        }
+
+        // İsim normalizasyonu (Türkçe karakterler ve özel karakterler için)
+        private string NormalizeName(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return "unknown";
+            
+            return name
+                .ToLowerInvariant()
+                .Replace("ç", "c")
+                .Replace("ğ", "g")
+                .Replace("ı", "i")
+                .Replace("ö", "o")
+                .Replace("ş", "s")
+                .Replace("ü", "u")
+                .Replace(" ", "-")
+                .Replace("'", "")
+                .Replace("\"", "")
+                .Replace(".", "")
+                .Replace(",", "")
+                .Replace("!", "")
+                .Replace("?", "")
+                .Replace("&", "and")
+                .Replace("+", "plus")
+                .Replace("=", "")
+                .Replace("@", "")
+                .Replace("#", "")
+                .Replace("$", "")
+                .Replace("%", "")
+                .Replace("^", "")
+                .Replace("*", "")
+                .Replace("(", "")
+                .Replace(")", "")
+                .Replace("[", "")
+                .Replace("]", "")
+                .Replace("{", "")
+                .Replace("}", "")
+                .Replace("|", "")
+                .Replace("\\", "")
+                .Replace("/", "")
+                .Replace(":", "")
+                .Replace(";", "")
+                .Replace("<", "")
+                .Replace(">", "")
+                .Replace(",", "")
+                .Replace("`", "")
+                .Replace("~", "")
+                .Trim('-');
+        }
+
+        // Benzersiz ID oluştur
+        private async Task<string> GenerateUniqueId(string baseId)
+        {
+            var uniqueId = baseId;
+            var counter = 1;
+            
+            // ID zaten varsa sayı ekle
+            while (true)
+            {
+                var doc = await _firestore.Collection("weddings").Document(uniqueId).GetSnapshotAsync();
+                if (!doc.Exists)
+                {
+                    break; // Benzersiz ID bulundu
+                }
+                
+                uniqueId = $"{baseId}-{counter}";
+                counter++;
+                
+                // Sonsuz döngüyü önle
+                if (counter > 100)
+                {
+                    // Fallback: timestamp ile benzersiz yap
+                    uniqueId = $"{baseId}-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+                    break;
+                }
+            }
+            
+            return uniqueId;
         }
 
         // Tema güncelleme
