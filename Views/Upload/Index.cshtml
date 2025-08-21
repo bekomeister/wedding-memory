@@ -290,8 +290,15 @@
         </div>
     </div>
 </div>
-<div class="text-center" style="color:#333; font-size:1.1rem; font-weight:500; margin-top:1.5rem; padding:1rem; background:rgba(255,255,255,0.95); border-radius:10px; box-shadow:0 2px 15px rgba(0,0,0,0.15); position:relative; z-index:10;">
-    Bir <a href="https://www.instagram.com/berkayzngn11/" target="_blank" style="color:#0d6efd; text-decoration:none; font-weight:600;">Berkay Zengin</a> projesidir.
+@{
+	var currentUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}";
+	var waNumber = "905398146320";
+	var waUrl = "https://wa.me/" + waNumber + "?text=" + Uri.EscapeDataString(currentUrl);
+}
+<div class="text-center" style="color:#333; font-size:1.1rem; font-weight:500; margin-top:1.5rem; padding:1rem; background:rgba(255,255,255,0.95); border-radius:10px; box-shadow:0 2px 15px rgba(0,0,0,0.15); position:relative; z-index:10; margin-top: 3rem; justify-content: space-between;">
+	Bir <a href="https://www.instagram.com/berkayzngn11/" target="_blank" style="color:#0d6efd; text-decoration:none; font-weight:600;">Berkay Zengin</a> projesidir.
+	<!--<a href="https://www.instagram.com/berkayzngn11/" target="_blank" class="btn btn-outline-secondary btn-sm" style="margin-left:10px;"><i class="fab fa-instagram"></i></a>-->
+	<a href="@waUrl" target="_blank" class="btn btn-success btn-sm" style="margin-left:6px;"><i class="fab fa-whatsapp"></i> </a>
 </div>
 
 <script>
