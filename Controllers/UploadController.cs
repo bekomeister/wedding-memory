@@ -55,15 +55,16 @@ namespace wedding_memory.Controllers
                 return RedirectToAction("Error", "Home");
             }
             var doc = await _firestore.Collection("weddings").Document(id).GetSnapshotAsync();
-            if (doc.Exists)
+            if (!doc.Exists)
             {
-                var wedding = doc.ConvertTo<Wedding>();
-                ViewBag.BrideName = wedding.BrideName;
-                ViewBag.GroomName = wedding.GroomName;
-                ViewBag.Theme = wedding.Theme ?? "classic";
-                ViewBag.BackgroundImageUrl = wedding.BackgroundImageUrl;
-                ViewBag.EventType = wedding.EventType ?? "wedding";
+                return NotFound();
             }
+            var wedding = doc.ConvertTo<Wedding>();
+            ViewBag.BrideName = wedding.BrideName;
+            ViewBag.GroomName = wedding.GroomName;
+            ViewBag.Theme = wedding.Theme ?? "classic";
+            ViewBag.BackgroundImageUrl = wedding.BackgroundImageUrl;
+            ViewBag.EventType = wedding.EventType ?? "wedding";
             ViewBag.WeddingId = id;
             return View();
         }
@@ -76,15 +77,16 @@ namespace wedding_memory.Controllers
                 return RedirectToAction("Error", "Home");
             }
             var doc = await _firestore.Collection("weddings").Document(id).GetSnapshotAsync();
-            if (doc.Exists)
+            if (!doc.Exists)
             {
-                var wedding = doc.ConvertTo<Wedding>();
-                ViewBag.BrideName = wedding.BrideName;
-                ViewBag.GroomName = wedding.GroomName;
-                ViewBag.Theme = wedding.Theme ?? "classic";
-                ViewBag.BackgroundImageUrl = wedding.BackgroundImageUrl;
-                ViewBag.EventType = wedding.EventType ?? "wedding";
+                return NotFound();
             }
+            var wedding = doc.ConvertTo<Wedding>();
+            ViewBag.BrideName = wedding.BrideName;
+            ViewBag.GroomName = wedding.GroomName;
+            ViewBag.Theme = wedding.Theme ?? "classic";
+            ViewBag.BackgroundImageUrl = wedding.BackgroundImageUrl;
+            ViewBag.EventType = wedding.EventType ?? "wedding";
             ViewBag.WeddingId = id;
 
             if (string.IsNullOrWhiteSpace(userName))
