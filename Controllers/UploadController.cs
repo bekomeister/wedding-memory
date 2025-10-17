@@ -12,7 +12,7 @@ namespace wedding_memory.Controllers
 {
     public class UploadController : Controller
     {
-        private readonly string bucketName = Environment.GetEnvironmentVariable("FIREBASE_STORAGE_BUCKET") ?? "wedding-memory-46705.appspot.com";
+        private readonly string bucketName = Environment.GetEnvironmentVariable("FIREBASE_STORAGE_BUCKET") ?? "wedding-memory-46705.firebasestorage.app";
         private readonly FirestoreDb _firestore;
         private readonly GoogleCredential _credential;
         
