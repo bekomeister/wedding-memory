@@ -5,6 +5,7 @@ using Google.Cloud.Firestore;
 using System.Threading.Tasks;
 using System.Linq;
 using Google.Cloud.Storage.V1;
+using Google.Apis.Storage.v1.Data;
 using QRCoder;
 using System.IO;
 using Google.Apis.Auth.OAuth2;
@@ -251,8 +252,14 @@ namespace wedding_memory.Controllers
             var files = new List<string>();
             foreach (var obj in storage.ListObjects(bucketName, id + "/"))
             {
-                // Public URL oluştur
-                string url = $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(obj.Name)}?alt=media";
+                string token = null;
+                if (obj.Metadata != null && obj.Metadata.TryGetValue("firebaseStorageDownloadTokens", out var t))
+                {
+                    token = t;
+                }
+                string url = token == null 
+                    ? $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(obj.Name)}?alt=media"
+                    : $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(obj.Name)}?alt=media&token={token}";
                 files.Add(url);
             }
             ViewBag.WeddingId = id;
@@ -296,11 +303,19 @@ namespace wedding_memory.Controllers
                 var storage = StorageClient.Create(_credential);
                 string bucketName = "wedding-memory-46705.appspot.com";
                 string objectName = $"{id}/background{ext}";
+                var token = Guid.NewGuid().ToString();
                 using (var stream = backgroundImage.OpenReadStream())
                 {
-                    await storage.UploadObjectAsync(bucketName, objectName, contentType, stream);
+                    var obj = new Google.Apis.Storage.v1.Data.Object
+                    {
+                        Bucket = bucketName,
+                        Name = objectName,
+                        ContentType = contentType,
+                        Metadata = new Dictionary<string, string> { { "firebaseStorageDownloadTokens", token } }
+                    };
+                    await storage.UploadObjectAsync(obj, stream);
                 }
-                string url = $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(objectName)}?alt=media&t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+                string url = $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(objectName)}?alt=media&token={token}&t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
 
                 // Firestore'a URL'i kaydet
                 var docRef = _firestore.Collection("weddings").Document(id);
