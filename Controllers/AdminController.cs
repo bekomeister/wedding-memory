@@ -276,19 +276,42 @@ namespace wedding_memory.Controllers
 
             // Görsel oranı kontrolü kaldırıldı, her türlü görsel yüklenebilir
 
-            // Firebase Storage'a yükle
-            var storage = StorageClient.Create(_credential);
-            string bucketName = "wedding-memory-46705.appspot.com";
-            string objectName = $"{id}/background{ext}";
-            using (var stream = backgroundImage.OpenReadStream())
+            try
             {
-                await storage.UploadObjectAsync(bucketName, objectName, backgroundImage.ContentType, stream);
-            }
-            string url = $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(objectName)}?alt=media&t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+                // İçerik türünü belirle (bazı istemciler null gönderebilir)
+                string contentType = backgroundImage.ContentType;
+                if (string.IsNullOrWhiteSpace(contentType))
+                {
+                    contentType = ext switch
+                    {
+                        ".jpg" => "image/jpeg",
+                        ".jpeg" => "image/jpeg",
+                        ".png" => "image/png",
+                        ".webp" => "image/webp",
+                        _ => "application/octet-stream"
+                    };
+                }
 
-            // Firestore'a URL'i kaydet
-            var docRef = _firestore.Collection("weddings").Document(id);
-            await docRef.UpdateAsync("BackgroundImageUrl", url);
+                // Firebase Storage'a yükle
+                var storage = StorageClient.Create(_credential);
+                string bucketName = "wedding-memory-46705.appspot.com";
+                string objectName = $"{id}/background{ext}";
+                using (var stream = backgroundImage.OpenReadStream())
+                {
+                    await storage.UploadObjectAsync(bucketName, objectName, contentType, stream);
+                }
+                string url = $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(objectName)}?alt=media&t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+                // Firestore'a URL'i kaydet
+                var docRef = _firestore.Collection("weddings").Document(id);
+                await docRef.UpdateAsync("BackgroundImageUrl", url);
+            }
+            catch (Exception ex)
+            {
+                // Platform loglarına ayrıntı yaz
+                Console.WriteLine($"UploadBackground error: {ex}");
+                TempData["Error"] = "Arkaplan yüklenirken bir hata oluştu. Lütfen tekrar deneyin.";
+            }
 
             return RedirectToAction("Index");
         }
