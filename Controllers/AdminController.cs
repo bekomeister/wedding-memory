@@ -248,7 +248,7 @@ namespace wedding_memory.Controllers
             if (HttpContext.Session.GetString("IsAdmin") != "true")
                 return RedirectToAction("Login");
             var storage = StorageClient.Create(_credential);
-            string bucketName = "wedding-memory-46705.appspot.com";
+            string bucketName = Environment.GetEnvironmentVariable("FIREBASE_STORAGE_BUCKET") ?? "wedding-memory-46705.appspot.com";
             var files = new List<string>();
             foreach (var obj in storage.ListObjects(bucketName, id + "/"))
             {
@@ -290,7 +290,7 @@ namespace wedding_memory.Controllers
 
                 // Firebase Storage'a yükle
                 var storage = StorageClient.Create(_credential);
-                string bucketName = "wedding-memory-46705.appspot.com";
+                string bucketName = Environment.GetEnvironmentVariable("FIREBASE_STORAGE_BUCKET") ?? "wedding-memory-46705.appspot.com";
                 string objectName = $"{id}/background.jpg";
                 var token = Guid.NewGuid().ToString();
                 using (var stream = backgroundImage.OpenReadStream())
