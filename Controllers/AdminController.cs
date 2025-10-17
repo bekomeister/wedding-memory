@@ -26,7 +26,11 @@ namespace wedding_memory.Controllers
                            "beko123";
             
             var credentialPath = GetFirebaseCredentialPath();
-            _credential = GoogleCredential.FromFile(credentialPath);
+            _credential = GoogleCredential.FromFile(credentialPath)
+                .CreateScoped(new[] {
+                    "https://www.googleapis.com/auth/datastore",
+                    "https://www.googleapis.com/auth/devstorage.full_control"
+                });
             var builder = new FirestoreDbBuilder
             {
                 ProjectId = "wedding-memory-46705",
@@ -242,7 +246,7 @@ namespace wedding_memory.Controllers
         {
             if (HttpContext.Session.GetString("IsAdmin") != "true")
                 return RedirectToAction("Login");
-            var storage = StorageClient.Create();
+            var storage = StorageClient.Create(_credential);
             string bucketName = "wedding-memory-46705.appspot.com";
             var files = new List<string>();
             foreach (var obj in storage.ListObjects(bucketName, id + "/"))
