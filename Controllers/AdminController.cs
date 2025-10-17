@@ -314,7 +314,7 @@ namespace wedding_memory.Controllers
             {
                 // Platform loglarına ayrıntı yaz
                 Console.WriteLine($"UploadBackground error: {ex}");
-                TempData["Error"] = "Arkaplan yüklenirken bir hata oluştu. Lütfen tekrar deneyin.";
+                TempData["BackgroundError"] = $"Arkaplan yüklenemedi: {ex.Message}";
             }
 
             return RedirectToAction("Index");
