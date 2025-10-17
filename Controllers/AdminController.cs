@@ -275,8 +275,8 @@ namespace wedding_memory.Controllers
             if (backgroundImage == null || backgroundImage.Length == 0)
                 return RedirectToAction("Index");
 
-            // Sadece resim dosyalarına izin ver
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            // Sadece JPG/JPEG kabul et (background.jpg olacak)
+            var allowedExtensions = new[] { ".jpg", ".jpeg" };
             var ext = Path.GetExtension(backgroundImage.FileName).ToLowerInvariant();
             if (!allowedExtensions.Contains(ext))
                 return RedirectToAction("Index");
@@ -286,23 +286,12 @@ namespace wedding_memory.Controllers
             try
             {
                 // İçerik türünü belirle (bazı istemciler null gönderebilir)
-                string contentType = backgroundImage.ContentType;
-                if (string.IsNullOrWhiteSpace(contentType))
-                {
-                    contentType = ext switch
-                    {
-                        ".jpg" => "image/jpeg",
-                        ".jpeg" => "image/jpeg",
-                        ".png" => "image/png",
-                        ".webp" => "image/webp",
-                        _ => "application/octet-stream"
-                    };
-                }
+                string contentType = "image/jpeg"; // background.jpg için sabit
 
                 // Firebase Storage'a yükle
                 var storage = StorageClient.Create(_credential);
                 string bucketName = "wedding-memory-46705.appspot.com";
-                string objectName = $"{id}/background{ext}";
+                string objectName = $"{id}/background.jpg";
                 var token = Guid.NewGuid().ToString();
                 using (var stream = backgroundImage.OpenReadStream())
                 {
