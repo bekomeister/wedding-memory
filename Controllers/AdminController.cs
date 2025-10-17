@@ -278,7 +278,7 @@ namespace wedding_memory.Controllers
             string objectName = $"{id}/background{ext}";
             using (var stream = backgroundImage.OpenReadStream())
             {
-                await storage.UploadObjectAsync(bucketName, objectName, backgroundImage.ContentType, stream, new UploadObjectOptions { PredefinedAcl = PredefinedObjectAcl.PublicRead });
+                await storage.UploadObjectAsync(bucketName, objectName, backgroundImage.ContentType, stream);
             }
             string url = $"https://firebasestorage.googleapis.com/v0/b/{bucketName}/o/{Uri.EscapeDataString(objectName)}?alt=media&t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
 
@@ -300,7 +300,7 @@ namespace wedding_memory.Controllers
 
             // Firebase Storage'dan ilgili wedding id klasöründeki tüm dosyaları sil
             var storage = StorageClient.Create(_credential);
-            string bucketName = "wedding-memory-46705.firebasestorage.app";
+            string bucketName = "wedding-memory-46705.appspot.com";
             var objects = storage.ListObjects(bucketName, id + "/");
             foreach (var obj in objects)
             {
