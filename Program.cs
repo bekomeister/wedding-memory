@@ -46,11 +46,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// Railway'de HTTPS redirection'ı kaldırıyoruz çünkü Railway kendi SSL'ini yönetiyor
-// if (app.Environment.IsDevelopment())
-// {
-//     app.UseHttpsRedirection();
-// }
+// Railway: container'ın dinlemesi gereken portu ortam değişkeninden al
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://+:{port}");
+// Railway kendi SSL'ini yönettiği için UseHttpsRedirection kullanmıyoruz
 app.UseRouting();
 app.UseSession();
 
